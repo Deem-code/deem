@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人主页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: "Segoe UI", system-ui, sans-serif;
+            background-color: #0b101b;
+            color: #e6edf7;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(20,80,180,0.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 70%, rgba(0,150,180,0.12) 0%, transparent 40%);
+            line-height: 1.7;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        /* 导航栏 */
+        nav {
+            position: sticky;
+            top: 0;
+            background: rgba(11,16,27,0.85);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(45,120,220,0.2);
+            z-index: 99;
+        }
+        .nav-wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #40a9ff;
+        }
+        .nav-links a {
+            color: #b0c4de;
+            text-decoration: none;
+            margin-left: 24px;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover {
+            color: #40a9ff;
+        }
+        /* 头部Hero */
+        .hero {
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            padding: 60px 0;
+            position: relative;
+        }
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom:16px;
+            background: linear-gradient(90deg,#40a9ff,#36d1dc);
+            -webkit-background-clip:text;
+            color: transparent;
+        }
+        .hero-sub {
+            font-size:18px;
+            color:#94a3b8;
+            max-width:700px;
+            margin:0 auto 30px;
+        }
+        .btn-group a {
+            display: inline-block;
+            padding:12px 28px;
+            border-radius:6px;
+            text-decoration:none;
+            margin:8px;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg,#2563eb,#0891b2);
+            color:white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(37,99,235,0.35);
+        }
+        .btn-outline {
+            border:1px solid #40a9ff;
+            color:#40a9ff;
+        }
+        .btn-outline:hover {
+            background-color:rgba(64,169,255,0.1);
+        }
+        section {
+            padding:70px 0;
+        }
+        .section-title {
+            font-size:28px;
+            margin-bottom:40px;
+            text-align:center;
+            position:relative;
+        }
+        .section-title::after {
+            content:"";
+            width:70px;
+            height:3px;
+            background:linear-gradient(90deg,#2563eb,#0891b2);
+            display:block;
+            margin:10px auto 0;
+            border-radius:2px;
+        }
+        /* 卡片通用样式 科技风 */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill,minmax(320px,1fr));
+            gap:24px;
+        }
+        .card {
+            background:rgba(20,28,44,0.65);
+            border:1px solid rgba(64,169,255,0.18);
+            border-radius:10px;
+            padding:24px;
+            transition: 0.3s;
+        }
+        .card:hover {
+            border-color:rgba(64,169,255,0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(8,145,178,0.15);
+        }
+        .card h3 {
+            color:#74c0fc;
+            margin-bottom:12px;
+        }
+        .card p {
+            color:#b0c4de;
+            font-size:15px;
+        }
+        /* 个人信息 */
+        .info-wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap:30px;
+        }
+        @media(max-width:768px){
+            .info-wrap{grid-template-columns:1fr;}
+            .nav-links a{margin-left:12px;font-size:12px;}
+            .hero h1{font-size:30px;}
+        }
+        .tag-list {
+            margin-top:14px;
+        }
+        .tag {
+            display:inline-block;
+            padding:4px 10px;
+            background:rgba(64,169,255,0.12);
+            border:1px solid rgba(64,169,255,0.25);
+            border-radius:4px;
+            font-size:13px;
+            margin:4px 6px 4px 0;
+            color:#90caf9;
+        }
+        /* 资源福利区块 */
+        .benefit-card {
+            border-left:3px solid #22c55e;
+        }
+        /* 页脚 */
+        footer {
+            border-top:1px solid rgba(64,169,255,0.15);
+            padding:30px 0;
+            text-align:center;
+            color:#64748b;
+            font-size:14px;
+        }
+        /* 粒子简单动态背景 */
+        #bg-canvas {
+            position: fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            z-index:-1;
+        }
+    </style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<!--导航栏-->
+<nav>
+    <div class="container nav-wrap">
+        <div class="logo">个人主页</div>
+        <div class="nav-links">
+            <a href="#about">个人信息</a>
+            <a href="#exp">竞赛证书</a>
+            <a href="#project">项目</a>
+            <a href="#future">未来发展</a>
+            <a href="#plan">未来规划</a>
+            <a href="#resource">资源福利</a>
+        </div>
+    </div>
+</nav>
+
+<!--首页Hero 吸引别人加入-->
+<div class="hero">
+    <div class="container">
+        <h1>张浩扬｜六边形战士</h1>
+        <p class="hero-sub">一起交流学习，共同成长，欢迎志同道合的伙伴</p>
+        <div class="btn-group">
+            <a href="#resource" class="btn-primary">获取资源与福利</a>
+            <a href="#about" class="btn-outline">了解更多</a>
+        </div>
+    </div>
+</div>
+
+<section id="about">
+    <div class="container">
+        <h2 class="section-title">个人基本信息</h2>
+        <div class="info-wrap">
+            <div class="card">
+                <h3>基础介绍</h3>
+                <p>姓名：张浩扬</p>
+                <p>班级：25软件技术3-1班</p>
+                <p>擅长方向：编程，羽毛球，篮球，游戏，音乐……</p>
+                <p>联系方式：V： lpsyp6666</p>
+                <div class="tag-list">
+                    <span class="tag">标签1</span>
+                    <span class="tag">标签2</span>
+                    <span class="tag">标签3</span>
+                </div>
+            </div>
+            <div class="card">
+                <h3>个人简介</h3>
+                <p>本人对技术痴迷，以及对竞赛，证书，专升本，考研，校级组织，项目，实习，职业规划……这些东西都十分有兴趣</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="exp">
+    <div class="container">
+        <h2 class="section-title">竞赛 & 证书</h2>
+        <div class="card-grid">
+            <div class="card">
+                <h3>竞赛类型一</h3>
+                <p>数模国赛，双创比赛……</p>
+                <p></p>
+            </div>
+            <div class="card">
+                <h3>竞赛类型二</h3>
+                <p>软件杯，编程大赛……</p>
+                <p>简单描述经历与收获</p>
+            </div>
+            <div class="card">
+                <h3>证书</h3>
+                <p>软考，计算机等级考试，华为、阿里云认证……</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="project">
+    <div class="container">
+        <h2 class="section-title">项目经历</h2>
+        <div class="card-grid">
+            <div class="card">
+                <h3>项目 1</h3>
+                <p>项目简介：AI工业软件管理平台</p>
+                <p>用到技术：Vue + FastAPI + AI + mysql</p>
+                <p></p>
+            </div>
+            <div class="card">
+                <h3>项目 2</h3>
+                <p>项目简介：小程序开发</p>
+                <p>用到技术：腾讯云低代码（bookstrap）</p>
+                <p></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="future">
+    <div class="container">
+        <h2 class="section-title">未来发展</h2>
+        <div class="card">
+            <h3>发展方向</h3>
+            <p></p>
+            <div class="tag-list">
+                <span class="tag">java + 大模型</span>
+                <span class="tag">AI全栈开发/AI应用</span>
+                <span class="tag">算法工程师</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="plan">
+    <div class="container">
+        <h2 class="section-title">未来规划</h2>
+        <div class="card-grid">
+            <div class="card">
+                <h3>短期规划</h3>
+                <p>学习最新技术，跟上时代发展，AI首当其冲</p>
+            </div>
+            <div class="card">
+                <h3>中长期规划</h3>
+                <p>创业/大厂</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="resource">
+    <div class="container">
+        <h2 class="section-title"> 福利</h2>
+        <div class="card benefit-card">
+            <h3>加入我可以获得的福利</h3>
+            <p>福利1：成为合伙人</p>
+            <p>福利2：共享资源（包括不限于学习资源，人脉人脉资源……）</p>
+            <br>
+            <p><strong>联系/加入：</strong>V： lpsyp6666</p>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        © 2026 个人主页 | All Rights Reserved
+    </div>
+</footer>
+
+<!--简单粒子JS背景，科技风效果-->
+<script>
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let w, h;
+let dots = [];
+
+function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+}
+window.addEventListener('resize',resize);
+resize();
+
+class Dot {
+    constructor(){
+        this.x = Math.random()*w;
+        this.y = Math.random()*h;
+        this.r = Math.random()*1.2 +0.3;
+        this.vx = (Math.random()-0.5)*0.4;
+        this.vy = (Math.random()-0.5)*0.4;
+    }
+    update(){
+        this.x += this.vx;
+        this.y += this.vy;
+        if(this.x<0||this.x>w) this.vx *= -1;
+        if(this.y<0||this.y>h) this.vy *= -1;
+    }
+    draw(){
+        ctx.beginPath();
+        ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+        ctx.fillStyle = "rgba(64,169,255,0.35)";
+        ctx.fill();
+    }
+}
+for(let i=0;i<80;i++) dots.push(new Dot());
+
+function loop(){
+    ctx.clearRect(0,0,w,h);
+    for(let i=0;i<dots.length;i++){
+        dots[i].update();
+        dots[i].draw();
+    }
+    //点连线
+    for(let i=0;i<dots.length;i++){
+        for(let j=i+1;j<dots.length;j++){
+            let dx = dots[i].x - dots[j].x;
+            let dy = dots[i].y - dots[j].y;
+            let dist = Math.sqrt(dx*dx+dy*dy);
+            if(dist <120){
+                ctx.beginPath();
+                ctx.moveTo(dots[i].x,dots[i].y);
+                ctx.lineTo(dots[j].x,dots[j].y);
+                ctx.strokeStyle = `rgba(64,169,255,${0.25-dist/480})`;
+                ctx.lineWidth=0.4;
+                ctx.stroke();
+            }
+        }
+    }
+    requestAnimationFrame(loop);
+}
+loop();
+</script>
+</body>
+</html>
